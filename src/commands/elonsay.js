@@ -76,17 +76,13 @@ module.exports = {
                 {
                     text: text,
                     reference_id: modelId,
-                    format: 'mp3',
-                    temperature: 0.7,
-                    top_p: 0.7,
-                    chunk_length: 200,
-                    normalize: true,
-                    latency: 'normal'
+                    format: 'mp3'
                 },
                 {
                     headers: {
                         'Authorization': `Bearer ${fishApiKey}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'model': 's1'
                     },
                     responseType: 'arraybuffer'
                 }

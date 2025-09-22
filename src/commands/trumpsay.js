@@ -82,7 +82,6 @@ module.exports = {
                     headers: {
                         'Authorization': `Bearer ${fishApiKey}`,
                         'Content-Type': 'application/json',
-                        // Use the s1 model as specified
                         'model': 's1'
                     },
                     responseType: 'arraybuffer'
