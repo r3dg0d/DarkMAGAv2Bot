@@ -78,7 +78,7 @@ module.exports = {
                         inline: false
                     }
                 )
-                .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Robert_F._Kennedy_Jr._at_Chautauqua_%28cropped%29.jpg/440px-Robert_F._Kennedy_Jr._at_Chautauqua_%28cropped%29.jpg')
+                .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Robert_F._Kennedy_Jr.%2C_official_portrait_%282025%29_%28cropped_3-4%29.jpg/512px-Robert_F._Kennedy_Jr.%2C_official_portrait_%282025%29_%28cropped_3-4%29.jpg')
                 .setFooter({
                     text: `RFK Jr. Model ID: ${modelId}${modelState ? ` | State: ${modelState}` : ''} | Powered by Fish Audio`
                 })
