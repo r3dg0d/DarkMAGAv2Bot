@@ -3,18 +3,17 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('disc
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('banallminors')
-        .setDescription('Ban all users with the minors role')
-        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+        .setDescription('Ban all users with the minors role (Founder only)')
         .addStringOption(option =>
             option.setName('reason')
                 .setDescription('Reason for banning (optional)')
                 .setRequired(false)),
 
     async execute(interaction) {
-        // Check if user has ban permissions
-        if (!interaction.member.permissions.has(PermissionFlagsBits.BanMembers)) {
+        // Check if user is the server owner (founder)
+        if (interaction.user.id !== interaction.guild.ownerId) {
             return interaction.reply({ 
-                content: '❌ You do not have permission to ban members.', 
+                content: '❌ This command can only be used by the server founder.', 
                 ephemeral: true 
             });
         }
