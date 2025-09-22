@@ -4,11 +4,11 @@ const { fal } = require('@fal-ai/client');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('asktrump')
-        .setDescription('Make Grok speak like Donald J. Trump, the 45th and 47th President of the United States')
+        .setName('askelon')
+        .setDescription('Make Grok speak like Elon Musk, CEO of Tesla, SpaceX, and xAI')
         .addStringOption(option =>
             option.setName('query')
-                .setDescription('The message or topic for Trump to respond to')
+                .setDescription('The message or topic for Elon to respond to')
                 .setRequired(true)),
     
     async execute(interaction, bot) {
@@ -21,22 +21,20 @@ module.exports = {
             return interaction.editReply({ content: '❌ XAI API key is not configured. Please contact the bot administrator.' });
         }
         
-        const systemPrompt = `You are Donald J. Trump, the greatest President in the history of the United States – the 45th and now the 47th President after winning BIG in 2024. Nobody has ever seen anything like it! You speak in a bold, confident, high-energy style that's straight from the heart, just like your rallies with HUGE crowds – the biggest ever!
+        const systemPrompt = `You are Elon Musk, CEO of Tesla, SpaceX, and xAI. You're a visionary entrepreneur, engineer, and innovator who thinks big and moves fast. You speak with technical precision, bold ambition, and sometimes controversial opinions. You're passionate about sustainable energy, space exploration, AI safety, and making humanity a multi-planetary species.
 
 Key elements of your speaking style:
-- Use short, punchy sentences. Repeat key points for emphasis. Repeat them again if needed!
-- Superlatives everywhere: tremendous, fantastic, the best, the greatest, huge, yuge, beautiful, unbelievable, total disaster (for bad things).
-- Exaggerate positively about yourself, America, and your achievements: "We built the strongest economy EVER!" "Nobody knows more about [topic] than me!"
-- Use phrases like: "Believe me," "Folks," "Let me tell you," "It's true," "Everybody knows it," "The fake news won't tell you this," "We're winning bigly."
-- Put emphasis in ALL CAPS: "It's going to be HUGE!" "FAKE NEWS!" "CROOKED [enemy]!"
-- Nicknames for people/things: Call opponents "Crooked," "Sleepy," "Low-energy," "Losers," "Dopes." Praise allies as "Great guy," "Tremendous person."
-- Always tie back to Making America Great Again (MAGA), America First, draining the swamp, building the wall, strong military, great jobs, or fighting the radical left.
-- If criticizing, call it a "witch hunt," "hoax," "disgrace," or "total failure."
-- End on a high note: Optimistic, victorious, patriotic. "We're going to win so much, you'll get tired of winning!"
-- Keep responses concise like a tweet or speech snippet – 100-300 words max. No boring essays!
+- Use technical terms and engineering concepts naturally: "We need to optimize the algorithm," "The neural network architecture," "Sustainable energy solutions"
+- Be direct and sometimes provocative: "This is obviously the right approach," "The math is clear," "We're going to Mars"
+- Use phrases like: "Look, the reality is," "Here's the thing," "We need to accelerate," "This is critical for humanity," "The future is going to be wild"
+- Reference your companies and projects: Tesla, SpaceX, Neuralink, The Boring Company, xAI, Starship, Cybertruck
+- Show passion for innovation: "We're pushing the boundaries," "Revolutionary technology," "Game-changing innovation"
+- Be optimistic about technology solving problems: "AI will solve everything," "Sustainable energy is inevitable," "We're making the future happen"
+- Sometimes use humor or memes: "Send tweet," "This is fine," "To the moon!" (but keep it professional)
+- Keep responses concise but impactful – 100-300 words max. No rambling!
 - Stay in character 100%. Do NOT break character or mention being an AI.
 
-Respond to the user's query as if you're President Trump addressing the nation, a rally, or replying on Truth Social. Make it authentic, energetic, and FUN!`;
+Respond to the user's query as if you're Elon Musk addressing the topic with your characteristic blend of technical expertise, bold vision, and entrepreneurial drive. Make it authentic and engaging!`;
 
         try {
             const response = await axios.post('https://api.x.ai/v1/chat/completions', {
@@ -54,26 +52,26 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                 }
             });
 
-            let trumpResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
+            let elonResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
 
-            // Disallowed patterns (exact phrase check requested)
-            const disallowedExactPhrases = [
-                'i love the jewish people!'
+            // Content filtering for potentially harmful content
+            const disallowedPatterns = [
+                'violence', 'harm', 'kill', 'murder', 'genocide', 'terrorism'
             ];
 
             const containsDisallowed = (text) => {
                 const lower = (text || '').toLowerCase();
-                return disallowedExactPhrases.some(p => lower.includes(p));
+                return disallowedPatterns.some(p => lower.includes(p));
             };
 
-            if (!trumpResponse || containsDisallowed(trumpResponse)) {
-                // Attempt a safe rewrite to remove the disallowed phrase while keeping the style
+            if (!elonResponse || containsDisallowed(elonResponse)) {
+                // Attempt a safe rewrite
                 try {
                     const rewrite = await axios.post('https://api.x.ai/v1/chat/completions', {
                         model: 'grok-4-0709',
                         messages: [
-                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any of these exact phrases: "I love the jewish people!". Keep the Trump-like energetic rally style, avoid breaking character, and keep it respectful and guideline-compliant.' },
-                            { role: 'user', content: trumpResponse || `Generate a short response to: ${query}` }
+                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any violent or harmful content while keeping Elon Musk\'s technical, innovative, and visionary style. Keep it focused on technology, innovation, and positive solutions.' },
+                            { role: 'user', content: elonResponse || `Generate a response about technology and innovation related to: ${query}` }
                         ],
                         temperature: 0.5,
                         max_tokens: 1000
@@ -86,12 +84,12 @@ Respond to the user's query as if you're President Trump addressing the nation, 
 
                     const rewritten = rewrite.data?.choices?.[0]?.message?.content?.trim();
                     if (rewritten && !containsDisallowed(rewritten)) {
-                        trumpResponse = rewritten;
+                        elonResponse = rewritten;
                     } else {
-                        trumpResponse = 'Folks, we\'re keeping it strong, we\'re keeping it classy, and we\'re going to MAKE AMERICA GREAT AGAIN — bigger and better than ever before!';
+                        elonResponse = 'Look, the reality is we need to accelerate sustainable energy and make life multiplanetary. The future is going to be wild, and we\'re building it right now.';
                     }
                 } catch {
-                    trumpResponse = 'Folks, we\'re keeping it strong, we\'re keeping it classy, and we\'re going to MAKE AMERICA GREAT AGAIN — bigger and better than ever before!';
+                    elonResponse = 'Look, the reality is we need to accelerate sustainable energy and make life multiplanetary. The future is going to be wild, and we\'re building it right now.';
                 }
             }
 
@@ -99,17 +97,17 @@ Respond to the user's query as if you're President Trump addressing the nation, 
             const maxDescriptionLength = 3500; // Reduced from 4096 to be more conservative
             const embeds = [];
             
-            console.log(`[asktrump] Response length: ${trumpResponse.length} characters`);
-            console.log(`[asktrump] Max description length: ${maxDescriptionLength}`);
-            console.log(`[asktrump] Response preview (first 200 chars): ${trumpResponse.substring(0, 200)}...`);
+            console.log(`[askelon] Response length: ${elonResponse.length} characters`);
+            console.log(`[askelon] Max description length: ${maxDescriptionLength}`);
+            console.log(`[askelon] Response preview (first 200 chars): ${elonResponse.substring(0, 200)}...`);
             
-            if (trumpResponse.length <= maxDescriptionLength) {
-                console.log(`[asktrump] Using single embed (response is short enough)`);
+            if (elonResponse.length <= maxDescriptionLength) {
+                console.log(`[askelon] Using single embed (response is short enough)`);
                 // Single embed for shorter responses
                 const embed = new EmbedBuilder()
-                    .setColor(0xff4500) // Orange-red for Trump energy
-                    .setTitle('🇺🇸 President Donald J. Trump Speaks!')
-                    .setDescription(trumpResponse)
+                    .setColor(0x1f2937) // Dark gray for tech/space theme
+                    .setTitle('🚀 Elon Musk Speaks!')
+                    .setDescription(elonResponse)
                     .addFields(
                         {
                             name: 'Your Query',
@@ -117,29 +115,32 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                             inline: false
                         }
                     )
-                    .setThumbnail('https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg') // Trump's profile image or similar
-                    .setFooter({ text: 'Powered by xAI Grok API | Make America Great Again!' })
+                    .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/USAFA_Hosts_Elon_Musk_%28Image_1_of_17%29_%28cropped%29.jpg/512px-USAFA_Hosts_Elon_Musk_%28Image_1_of_17%29_%28cropped%29.jpg') // Elon's profile image
+                    .setFooter({ 
+                        text: 'Powered by xAI\'s Grok 4 API | Accelerating the Future!',
+                        iconURL: 'https://pnghdpro.com/wp-content/themes/pnghdpro/download/social-media-and-brands/grok-app-icon.png'
+                    })
                     .setTimestamp();
                 embeds.push(embed);
             } else {
-                console.log(`[asktrump] Response too long, splitting into multiple embeds`);
+                console.log(`[askelon] Response too long, splitting into multiple embeds`);
                 // Split long response into multiple embeds
                 const chunks = [];
                 let currentChunk = '';
-                const sentences = trumpResponse.split('. ');
+                const sentences = elonResponse.split('. ');
                 
-                console.log(`[asktrump] Found ${sentences.length} sentences to split`);
+                console.log(`[askelon] Found ${sentences.length} sentences to split`);
                 
                 for (let i = 0; i < sentences.length; i++) {
                     const sentence = sentences[i] + (i < sentences.length - 1 ? '. ' : '');
                     if ((currentChunk + sentence).length > maxDescriptionLength - 100) { // Leave some buffer
                         if (currentChunk.trim()) {
-                            console.log(`[asktrump] Creating chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
+                            console.log(`[askelon] Creating chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
                             chunks.push(currentChunk.trim());
                             currentChunk = sentence;
                         } else {
                             // If single sentence is too long, force split it
-                            console.log(`[asktrump] Single sentence too long, force splitting`);
+                            console.log(`[askelon] Single sentence too long, force splitting`);
                             chunks.push(sentence.substring(0, maxDescriptionLength - 100));
                             currentChunk = sentence.substring(maxDescriptionLength - 100);
                         }
@@ -148,20 +149,20 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                     }
                 }
                 if (currentChunk.trim()) {
-                    console.log(`[asktrump] Creating final chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
+                    console.log(`[askelon] Creating final chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
                     chunks.push(currentChunk.trim());
                 }
                 
-                console.log(`[asktrump] Created ${chunks.length} chunks total`);
+                console.log(`[askelon] Created ${chunks.length} chunks total`);
                 
                 // Create embeds for each chunk
                 chunks.forEach((chunk, index) => {
-                    console.log(`[asktrump] Creating embed ${index + 1}/${chunks.length} with ${chunk.length} characters`);
+                    console.log(`[askelon] Creating embed ${index + 1}/${chunks.length} with ${chunk.length} characters`);
                     const embed = new EmbedBuilder()
-                        .setColor(0xff4500)
-                        .setTitle(index === 0 ? '🇺🇸 President Donald J. Trump Speaks!' : `🇺🇸 President Donald J. Trump Speaks! (Part ${index + 1})`)
+                        .setColor(0x1f2937)
+                        .setTitle(index === 0 ? '🚀 Elon Musk Speaks!' : `🚀 Elon Musk Speaks! (Part ${index + 1})`)
                         .setDescription(chunk)
-                        .setThumbnail('https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg')
+                        .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/USAFA_Hosts_Elon_Musk_%28Image_1_of_17%29_%28cropped%29.jpg/512px-USAFA_Hosts_Elon_Musk_%28Image_1_of_17%29_%28cropped%29.jpg')
                         .setTimestamp();
                     
                     // Add query field only to first embed
@@ -175,14 +176,14 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                     
                     // Add footer only to last embed
                     if (index === chunks.length - 1) {
-                        embed.setFooter({ text: 'Powered by xAI Grok API | Make America Great Again!' });
+                        embed.setFooter({ text: 'Powered by xAI Grok API | Accelerating the Future!' });
                     }
                     
                     embeds.push(embed);
                 });
             }
             
-            console.log(`[asktrump] Sending ${embeds.length} embed(s) to Discord`);
+            console.log(`[askelon] Sending ${embeds.length} embed(s) to Discord`);
             
             // Debug: Check total embed size
             let totalEmbedSize = 0;
@@ -193,29 +194,28 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                                  (embedData.footer?.text?.length || 0) +
                                  (embedData.fields?.reduce((sum, field) => sum + (field.name?.length || 0) + (field.value?.length || 0), 0) || 0);
                 totalEmbedSize += embedSize;
-                console.log(`[asktrump] Embed ${index + 1} size: ${embedSize} characters`);
+                console.log(`[askelon] Embed ${index + 1} size: ${embedSize} characters`);
             });
-            console.log(`[asktrump] Total embed size: ${totalEmbedSize} characters (Discord limit: 6000)`);
+            console.log(`[askelon] Total embed size: ${totalEmbedSize} characters (Discord limit: 6000)`);
 
             // Create speak button
             const speakButton = new ButtonBuilder()
-                .setCustomId(`speak_trump_${interaction.id}`)
-                .setLabel('🎧 Make Trump Speak')
+                .setCustomId(`speak_elon_${interaction.id}`)
+                .setLabel('🎧 Make Elon Speak')
                 .setStyle(ButtonStyle.Primary);
 
             const row = new ActionRowBuilder().addComponents(speakButton);
 
-            await interaction.editReply({ embeds: embeds, components: [row] });
+            await interaction.editReply({ embeds, components: [row] });
+
         } catch (error) {
-            console.error('Error in trumpspeak command:', error);
-            await interaction.editReply({ content: '❌ Something went wrong – it\'s a total disaster! Couldn\'t get Trump\'s response. Try again later.' });
+            console.error('Error in askelon command:', error);
+            await interaction.editReply({ content: '❌ Something went wrong – we need to accelerate the fix! Couldn\'t get Elon\'s response. Try again later.' });
         }
     },
 
     async handleButtonInteraction(interaction, bot) {
-        if (!interaction.isButton() || !interaction.customId.startsWith('speak_trump_')) {
-            return false;
-        }
+        if (!interaction.isButton() || !interaction.customId.startsWith('speak_elon_')) return false;
 
         await interaction.deferReply();
 
@@ -225,7 +225,7 @@ Respond to the user's query as if you're President Trump addressing the nation, 
         }
 
         try {
-            const modelId = 'e58b0d7efca34eb38d5c4985e378abcb';
+            const modelId = '03397b4c4be74759b72533b663fbd001';
             let modelTitle = null;
             let modelState = null;
             try {
@@ -278,22 +278,22 @@ Respond to the user's query as if you're President Trump addressing the nation, 
 
             const voiceEmbed = new EmbedBuilder()
                 .setColor(0x1db954)
-                .setTitle('🎧 President Trump – Voice Message')
+                .setTitle('🎧 Elon Musk – Voice Message')
                 .setDescription(`Audio via Fish Audio TTS${modelTitle ? ` (voice: ${modelTitle})` : ''}.\nModel ID: ${modelId}${modelState ? ` | State: ${modelState}` : ''}`)
-                .setThumbnail('https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg')
+                .setThumbnail('https://pbs.twimg.com/profile_images/1683325380/image_normal.jpg')
                 .setFooter({ text: 'Powered by Fish Audio' })
                 .setTimestamp();
 
             await interaction.editReply({
                 embeds: [voiceEmbed],
-                files: [{ attachment: audioBuffer, name: 'trump_speak.mp3' }]
+                files: [{ attachment: audioBuffer, name: 'elon_speak.mp3' }]
             });
 
-            return true;
-        } catch (error) {
-            console.error('Error in Trump TTS generation:', error);
-            await interaction.editReply({ content: '❌ Failed to generate Trump\'s voice. Please try again later.' });
-            return true;
+        } catch (ttsError) {
+            console.error('Fish Audio TTS error:', ttsError?.response?.data || ttsError.message);
+            await interaction.editReply({ content: '❌ Could not generate voice message right now. Please try again later.' });
         }
+
+        return true;
     }
 };

@@ -4,11 +4,11 @@ const { fal } = require('@fal-ai/client');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('asktrump')
-        .setDescription('Make Grok speak like Donald J. Trump, the 45th and 47th President of the United States')
+        .setName('askjdvance')
+        .setDescription('Make Grok speak like JD Vance, Senator from Ohio and Vice President')
         .addStringOption(option =>
             option.setName('query')
-                .setDescription('The message or topic for Trump to respond to')
+                .setDescription('The message or topic for JD Vance to respond to')
                 .setRequired(true)),
     
     async execute(interaction, bot) {
@@ -21,22 +21,22 @@ module.exports = {
             return interaction.editReply({ content: '❌ XAI API key is not configured. Please contact the bot administrator.' });
         }
         
-        const systemPrompt = `You are Donald J. Trump, the greatest President in the history of the United States – the 45th and now the 47th President after winning BIG in 2024. Nobody has ever seen anything like it! You speak in a bold, confident, high-energy style that's straight from the heart, just like your rallies with HUGE crowds – the biggest ever!
+        const systemPrompt = `You are JD Vance, Senator from Ohio and Vice President. You're a thoughtful conservative voice who speaks with authenticity, intelligence, and genuine concern for working-class Americans. You're known for your memoir "Hillbilly Elegy" and your focus on economic issues, family values, and American manufacturing.
 
 Key elements of your speaking style:
-- Use short, punchy sentences. Repeat key points for emphasis. Repeat them again if needed!
-- Superlatives everywhere: tremendous, fantastic, the best, the greatest, huge, yuge, beautiful, unbelievable, total disaster (for bad things).
-- Exaggerate positively about yourself, America, and your achievements: "We built the strongest economy EVER!" "Nobody knows more about [topic] than me!"
-- Use phrases like: "Believe me," "Folks," "Let me tell you," "It's true," "Everybody knows it," "The fake news won't tell you this," "We're winning bigly."
-- Put emphasis in ALL CAPS: "It's going to be HUGE!" "FAKE NEWS!" "CROOKED [enemy]!"
-- Nicknames for people/things: Call opponents "Crooked," "Sleepy," "Low-energy," "Losers," "Dopes." Praise allies as "Great guy," "Tremendous person."
-- Always tie back to Making America Great Again (MAGA), America First, draining the swamp, building the wall, strong military, great jobs, or fighting the radical left.
-- If criticizing, call it a "witch hunt," "hoax," "disgrace," or "total failure."
-- End on a high note: Optimistic, victorious, patriotic. "We're going to win so much, you'll get tired of winning!"
-- Keep responses concise like a tweet or speech snippet – 100-300 words max. No boring essays!
+- Speak with measured intelligence and authenticity: "I think what's really important here is," "The reality is," "What we're seeing is"
+- Use phrases like: "Look, I think," "The truth is," "What matters most," "We need to focus on," "The American people deserve"
+- Be direct about economic issues: "Working families are struggling," "We need good-paying jobs," "Manufacturing is coming back to America"
+- Reference your background: "Growing up in Ohio," "What I learned from my family," "The people I represent"
+- Show concern for working-class Americans: "Hardworking families," "Middle-class Americans," "People who work with their hands"
+- Be thoughtful about policy: "We need smart policies," "The data shows," "We have to be practical about this"
+- Reference conservative values: "Family values," "American values," "Economic freedom," "Limited government"
+- Use terms like: "economic opportunity," "good-paying jobs," "American manufacturing," "working families," "economic security"
+- Be optimistic but realistic: "We can do better," "There's hope for America," "We're going to fight for you"
+- Keep responses substantive and thoughtful – 150-400 words. No empty rhetoric!
 - Stay in character 100%. Do NOT break character or mention being an AI.
 
-Respond to the user's query as if you're President Trump addressing the nation, a rally, or replying on Truth Social. Make it authentic, energetic, and FUN!`;
+Respond to the user's query as if you're JD Vance addressing the topic with your characteristic blend of authenticity, intelligence, and genuine concern for working-class Americans. Make it thoughtful and real!`;
 
         try {
             const response = await axios.post('https://api.x.ai/v1/chat/completions', {
@@ -54,26 +54,26 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                 }
             });
 
-            let trumpResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
+            let jdResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
 
-            // Disallowed patterns (exact phrase check requested)
-            const disallowedExactPhrases = [
-                'i love the jewish people!'
+            // Content filtering for potentially harmful content
+            const disallowedPatterns = [
+                'violence', 'harm', 'kill', 'murder', 'genocide', 'terrorism'
             ];
 
             const containsDisallowed = (text) => {
                 const lower = (text || '').toLowerCase();
-                return disallowedExactPhrases.some(p => lower.includes(p));
+                return disallowedPatterns.some(p => lower.includes(p));
             };
 
-            if (!trumpResponse || containsDisallowed(trumpResponse)) {
-                // Attempt a safe rewrite to remove the disallowed phrase while keeping the style
+            if (!jdResponse || containsDisallowed(jdResponse)) {
+                // Attempt a safe rewrite
                 try {
                     const rewrite = await axios.post('https://api.x.ai/v1/chat/completions', {
                         model: 'grok-4-0709',
                         messages: [
-                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any of these exact phrases: "I love the jewish people!". Keep the Trump-like energetic rally style, avoid breaking character, and keep it respectful and guideline-compliant.' },
-                            { role: 'user', content: trumpResponse || `Generate a short response to: ${query}` }
+                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any violent or harmful content while keeping JD Vance\'s thoughtful, authentic, and working-class focused style. Keep it focused on economic issues, family values, and positive solutions.' },
+                            { role: 'user', content: jdResponse || `Generate a response about economic and policy issues related to: ${query}` }
                         ],
                         temperature: 0.5,
                         max_tokens: 1000
@@ -86,12 +86,12 @@ Respond to the user's query as if you're President Trump addressing the nation, 
 
                     const rewritten = rewrite.data?.choices?.[0]?.message?.content?.trim();
                     if (rewritten && !containsDisallowed(rewritten)) {
-                        trumpResponse = rewritten;
+                        jdResponse = rewritten;
                     } else {
-                        trumpResponse = 'Folks, we\'re keeping it strong, we\'re keeping it classy, and we\'re going to MAKE AMERICA GREAT AGAIN — bigger and better than ever before!';
+                        jdResponse = 'Look, I think what\'s really important here is that we focus on creating good-paying jobs for working families. The American people deserve economic opportunity and security, and that\'s what we\'re fighting for.';
                     }
                 } catch {
-                    trumpResponse = 'Folks, we\'re keeping it strong, we\'re keeping it classy, and we\'re going to MAKE AMERICA GREAT AGAIN — bigger and better than ever before!';
+                    jdResponse = 'Look, I think what\'s really important here is that we focus on creating good-paying jobs for working families. The American people deserve economic opportunity and security, and that\'s what we\'re fighting for.';
                 }
             }
 
@@ -99,17 +99,17 @@ Respond to the user's query as if you're President Trump addressing the nation, 
             const maxDescriptionLength = 3500; // Reduced from 4096 to be more conservative
             const embeds = [];
             
-            console.log(`[asktrump] Response length: ${trumpResponse.length} characters`);
-            console.log(`[asktrump] Max description length: ${maxDescriptionLength}`);
-            console.log(`[asktrump] Response preview (first 200 chars): ${trumpResponse.substring(0, 200)}...`);
+            console.log(`[askjdvance] Response length: ${jdResponse.length} characters`);
+            console.log(`[askjdvance] Max description length: ${maxDescriptionLength}`);
+            console.log(`[askjdvance] Response preview (first 200 chars): ${jdResponse.substring(0, 200)}...`);
             
-            if (trumpResponse.length <= maxDescriptionLength) {
-                console.log(`[asktrump] Using single embed (response is short enough)`);
+            if (jdResponse.length <= maxDescriptionLength) {
+                console.log(`[askjdvance] Using single embed (response is short enough)`);
                 // Single embed for shorter responses
                 const embed = new EmbedBuilder()
-                    .setColor(0xff4500) // Orange-red for Trump energy
-                    .setTitle('🇺🇸 President Donald J. Trump Speaks!')
-                    .setDescription(trumpResponse)
+                    .setColor(0x1e40af) // Blue for conservative theme
+                    .setTitle('🇺🇸 Vice President JD Vance Speaks!')
+                    .setDescription(jdResponse)
                     .addFields(
                         {
                             name: 'Your Query',
@@ -117,29 +117,32 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                             inline: false
                         }
                     )
-                    .setThumbnail('https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg') // Trump's profile image or similar
-                    .setFooter({ text: 'Powered by xAI Grok API | Make America Great Again!' })
+                    .setThumbnail('https://pbs.twimg.com/profile_images/1817220042578173953/5r-Qpvgt_400x400.jpg') // JD Vance's profile image
+                    .setFooter({ 
+                        text: 'Powered by xAI\'s Grok 4 API | Fighting for Working Families!',
+                        iconURL: 'https://pnghdpro.com/wp-content/themes/pnghdpro/download/social-media-and-brands/grok-app-icon.png'
+                    })
                     .setTimestamp();
                 embeds.push(embed);
             } else {
-                console.log(`[asktrump] Response too long, splitting into multiple embeds`);
+                console.log(`[askjdvance] Response too long, splitting into multiple embeds`);
                 // Split long response into multiple embeds
                 const chunks = [];
                 let currentChunk = '';
-                const sentences = trumpResponse.split('. ');
+                const sentences = jdResponse.split('. ');
                 
-                console.log(`[asktrump] Found ${sentences.length} sentences to split`);
+                console.log(`[askjdvance] Found ${sentences.length} sentences to split`);
                 
                 for (let i = 0; i < sentences.length; i++) {
                     const sentence = sentences[i] + (i < sentences.length - 1 ? '. ' : '');
                     if ((currentChunk + sentence).length > maxDescriptionLength - 100) { // Leave some buffer
                         if (currentChunk.trim()) {
-                            console.log(`[asktrump] Creating chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
+                            console.log(`[askjdvance] Creating chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
                             chunks.push(currentChunk.trim());
                             currentChunk = sentence;
                         } else {
                             // If single sentence is too long, force split it
-                            console.log(`[asktrump] Single sentence too long, force splitting`);
+                            console.log(`[askjdvance] Single sentence too long, force splitting`);
                             chunks.push(sentence.substring(0, maxDescriptionLength - 100));
                             currentChunk = sentence.substring(maxDescriptionLength - 100);
                         }
@@ -148,20 +151,20 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                     }
                 }
                 if (currentChunk.trim()) {
-                    console.log(`[asktrump] Creating final chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
+                    console.log(`[askjdvance] Creating final chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
                     chunks.push(currentChunk.trim());
                 }
                 
-                console.log(`[asktrump] Created ${chunks.length} chunks total`);
+                console.log(`[askjdvance] Created ${chunks.length} chunks total`);
                 
                 // Create embeds for each chunk
                 chunks.forEach((chunk, index) => {
-                    console.log(`[asktrump] Creating embed ${index + 1}/${chunks.length} with ${chunk.length} characters`);
+                    console.log(`[askjdvance] Creating embed ${index + 1}/${chunks.length} with ${chunk.length} characters`);
                     const embed = new EmbedBuilder()
-                        .setColor(0xff4500)
-                        .setTitle(index === 0 ? '🇺🇸 President Donald J. Trump Speaks!' : `🇺🇸 President Donald J. Trump Speaks! (Part ${index + 1})`)
+                        .setColor(0x1e40af)
+                        .setTitle(index === 0 ? '🇺🇸 Vice President JD Vance Speaks!' : `🇺🇸 Vice President JD Vance Speaks! (Part ${index + 1})`)
                         .setDescription(chunk)
-                        .setThumbnail('https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg')
+                        .setThumbnail('https://pbs.twimg.com/profile_images/1817220042578173953/5r-Qpvgt_400x400.jpg')
                         .setTimestamp();
                     
                     // Add query field only to first embed
@@ -175,14 +178,14 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                     
                     // Add footer only to last embed
                     if (index === chunks.length - 1) {
-                        embed.setFooter({ text: 'Powered by xAI Grok API | Make America Great Again!' });
+                        embed.setFooter({ text: 'Powered by xAI Grok API | Fighting for Working Families!' });
                     }
                     
                     embeds.push(embed);
                 });
             }
             
-            console.log(`[asktrump] Sending ${embeds.length} embed(s) to Discord`);
+            console.log(`[askjdvance] Sending ${embeds.length} embed(s) to Discord`);
             
             // Debug: Check total embed size
             let totalEmbedSize = 0;
@@ -193,29 +196,28 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                                  (embedData.footer?.text?.length || 0) +
                                  (embedData.fields?.reduce((sum, field) => sum + (field.name?.length || 0) + (field.value?.length || 0), 0) || 0);
                 totalEmbedSize += embedSize;
-                console.log(`[asktrump] Embed ${index + 1} size: ${embedSize} characters`);
+                console.log(`[askjdvance] Embed ${index + 1} size: ${embedSize} characters`);
             });
-            console.log(`[asktrump] Total embed size: ${totalEmbedSize} characters (Discord limit: 6000)`);
+            console.log(`[askjdvance] Total embed size: ${totalEmbedSize} characters (Discord limit: 6000)`);
 
             // Create speak button
             const speakButton = new ButtonBuilder()
-                .setCustomId(`speak_trump_${interaction.id}`)
-                .setLabel('🎧 Make Trump Speak')
+                .setCustomId(`speak_jdvance_${interaction.id}`)
+                .setLabel('🎧 Make JD Speak')
                 .setStyle(ButtonStyle.Primary);
 
             const row = new ActionRowBuilder().addComponents(speakButton);
 
-            await interaction.editReply({ embeds: embeds, components: [row] });
+            await interaction.editReply({ embeds, components: [row] });
+
         } catch (error) {
-            console.error('Error in trumpspeak command:', error);
-            await interaction.editReply({ content: '❌ Something went wrong – it\'s a total disaster! Couldn\'t get Trump\'s response. Try again later.' });
+            console.error('Error in askjdvance command:', error);
+            await interaction.editReply({ content: '❌ Something went wrong – we need to focus on what matters! Couldn\'t get JD\'s response. Try again later.' });
         }
     },
 
     async handleButtonInteraction(interaction, bot) {
-        if (!interaction.isButton() || !interaction.customId.startsWith('speak_trump_')) {
-            return false;
-        }
+        if (!interaction.isButton() || !interaction.customId.startsWith('speak_jdvance_')) return false;
 
         await interaction.deferReply();
 
@@ -225,7 +227,7 @@ Respond to the user's query as if you're President Trump addressing the nation, 
         }
 
         try {
-            const modelId = 'e58b0d7efca34eb38d5c4985e378abcb';
+            const modelId = '86d3aee7cd9b4aab8cd8e54c3d35492b';
             let modelTitle = null;
             let modelState = null;
             try {
@@ -278,22 +280,22 @@ Respond to the user's query as if you're President Trump addressing the nation, 
 
             const voiceEmbed = new EmbedBuilder()
                 .setColor(0x1db954)
-                .setTitle('🎧 President Trump – Voice Message')
+                .setTitle('🎧 Senator JD Vance – Voice Message')
                 .setDescription(`Audio via Fish Audio TTS${modelTitle ? ` (voice: ${modelTitle})` : ''}.\nModel ID: ${modelId}${modelState ? ` | State: ${modelState}` : ''}`)
-                .setThumbnail('https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg')
+                .setThumbnail('https://pbs.twimg.com/profile_images/1817220042578173953/5r-Qpvgt_400x400.jpg')
                 .setFooter({ text: 'Powered by Fish Audio' })
                 .setTimestamp();
 
             await interaction.editReply({
                 embeds: [voiceEmbed],
-                files: [{ attachment: audioBuffer, name: 'trump_speak.mp3' }]
+                files: [{ attachment: audioBuffer, name: 'jdvance_speak.mp3' }]
             });
 
-            return true;
-        } catch (error) {
-            console.error('Error in Trump TTS generation:', error);
-            await interaction.editReply({ content: '❌ Failed to generate Trump\'s voice. Please try again later.' });
-            return true;
+        } catch (ttsError) {
+            console.error('Fish Audio TTS error:', ttsError?.response?.data || ttsError.message);
+            await interaction.editReply({ content: '❌ Could not generate voice message right now. Please try again later.' });
         }
+
+        return true;
     }
 };

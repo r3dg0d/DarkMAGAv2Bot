@@ -9,6 +9,7 @@ const cron = require('node-cron');
 const Database = require('./utils/database');
 const FileUtils = require('./utils/fileUtils');
 const LevelingSystem = require('./utils/leveling');
+const CountingSystem = require('./utils/counting');
 const config = require('./config');
 
 // Import handlers
@@ -39,6 +40,7 @@ class DarkMAGABot {
         this.database = new Database();
         this.fileUtils = new FileUtils();
         this.leveling = new LevelingSystem(this.database);
+        this.counting = new CountingSystem(this.database);
 
         // Initialize handlers
         this.commandHandler = new CommandHandler(this);
@@ -51,6 +53,9 @@ class DarkMAGABot {
         try {
             // Copy existing data files
             await this.fileUtils.copyExistingData();
+            
+            // Initialize counting system
+            await this.counting.initialize();
             
             // Initialize handlers
             await this.commandHandler.loadCommands();
@@ -116,6 +121,13 @@ class DarkMAGABot {
 
             if (message.author?.bot) return;
 
+            // Handle counting channel
+            const countingResult = await this.counting.handleCountingMessage(message);
+            if (countingResult.action !== 'none') {
+                // Counting system handled the message, skip other processing
+                return;
+            }
+
             // Handle modmail for DMs
             const isDM = (
                 message.channel?.type === 1 || 
@@ -136,7 +148,7 @@ class DarkMAGABot {
 
             // Update leveling
             if (message.guild) {
-                const levelResult = await this.leveling.updateUserLevel(message.author.id, message.guild.id);
+                const levelResult = await this.leveling.updateUserLevel(message.author.id, message.guild.id, message.channel.id);
                 
                 // Send level-up message if user leveled up
                 if (levelResult && levelResult.leveledUp) {
@@ -170,6 +182,14 @@ class DarkMAGABot {
                             console.error('Failed to send level-up message:', channelError);
                         }
                     }
+                }
+
+                // Check for Bible verse references
+                try {
+                    const bibleVerseCommand = require('./commands/bibleverse');
+                    await bibleVerseCommand.detectAndRespondToVerse(message, this);
+                } catch (error) {
+                    console.error('Error in Bible verse detection:', error);
                 }
             }
         });
@@ -473,6 +493,25 @@ class DarkMAGABot {
         } else if (customId === 'ticket_archive') {
             console.log('Handling ticket archive button'); // Debug log
             await this.handleTicketArchive(interaction);
+        } else if (customId.startsWith('tts_')) {
+            console.log('Handling TTS button with customId:', customId); // Debug log
+            // Load the uncensoredlm command and handle TTS
+            const uncensoredlmCommand = require('./commands/uncensoredlm');
+            if (uncensoredlmCommand.handleButtonInteraction) {
+                const handled = await uncensoredlmCommand.handleButtonInteraction(interaction, this);
+                if (handled) {
+                    console.log('TTS button handled successfully');
+                    return;
+                } else {
+                    console.log('TTS button handler returned false');
+                }
+            } else {
+                console.log('No handleButtonInteraction method found in uncensoredlm command');
+            }
+        } else if (customId.startsWith('speak_')) {
+            console.log('Handling speak button with customId:', customId); // Debug log
+            // Handle askcharacter speak buttons
+            await this.handleSpeakButton(interaction);
         } else {
             console.log('Unknown button custom ID:', customId); // Debug log
         }
@@ -1003,6 +1042,65 @@ class DarkMAGABot {
         } catch (error) {
             console.error('Error logging in:', error);
             process.exit(1);
+        }
+    }
+
+    async handleSpeakButton(interaction) {
+        try {
+            const customId = interaction.customId;
+            console.log('Handling speak button:', customId);
+            
+            // Extract character name from custom ID (e.g., "speak_elon_123456" -> "elon")
+            const parts = customId.split('_');
+            if (parts.length < 2) {
+                console.error('Invalid speak button custom ID:', customId);
+                await interaction.reply({ content: '❌ Invalid button configuration.', ephemeral: true });
+                return;
+            }
+            
+            const characterName = parts[1]; // "elon", "joerogan", etc.
+            console.log('Character name:', characterName);
+            
+            // Map character names to command files
+            const commandMap = {
+                'joerogan': 'askjoerogan',
+                'elon': 'askelon',
+                'jdvance': 'askjdvance',
+                'samaltman': 'asksamaltman',
+                'rfkjr': 'askrfkjr',
+                'njf': 'asknjf',
+                'egirl': 'askegirl',
+                'trump': 'trumpspeak'
+            };
+            
+            const commandName = commandMap[characterName];
+            if (!commandName) {
+                console.error('Unknown character:', characterName);
+                await interaction.reply({ content: '❌ Unknown character.', ephemeral: true });
+                return;
+            }
+            
+            // Load the command and handle the button interaction
+            const command = require(`./commands/${commandName}`);
+            if (command.handleButtonInteraction) {
+                const handled = await command.handleButtonInteraction(interaction, this);
+                if (handled) {
+                    console.log('Speak button handled successfully for:', characterName);
+                } else {
+                    console.log('Speak button handler returned false for:', characterName);
+                }
+            } else {
+                console.error('No handleButtonInteraction method found in', commandName);
+                await interaction.reply({ content: '❌ Button handler not found.', ephemeral: true });
+            }
+            
+        } catch (error) {
+            console.error('Error handling speak button:', error);
+            try {
+                await interaction.reply({ content: '❌ An error occurred while processing the speak button.', ephemeral: true });
+            } catch (replyError) {
+                console.error('Error sending error reply:', replyError);
+            }
         }
     }
 }

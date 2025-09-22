@@ -53,17 +53,18 @@ class LevelingSystem {
     }
 
     getRankRoleId(level) {
-        if (level >= 1 && level <= 9) return "patriotI";
-        if (level >= 10 && level <= 19) return "patriotII";
-        if (level >= 20 && level <= 29) return "patriotIII";
-        if (level >= 30 && level <= 39) return "patriotIV";
-        if (level >= 40 && level <= 49) return "patriotV";
-        if (level >= 50 && level <= 59) return "patriotVI";
-        if (level >= 60 && level <= 69) return "patriotVII";
-        if (level >= 70 && level <= 79) return "patriotVIII";
-        if (level >= 80 && level <= 89) return "patriotIX";
-        if (level >= 90 && level <= 100) return "patriotX";
-        if (level > 100) return "magaLegend";
+        const config = require('./config');
+        if (level >= 1 && level <= 9) return config.roles.patriotI;
+        if (level >= 10 && level <= 19) return config.roles.patriotII;
+        if (level >= 20 && level <= 29) return config.roles.patriotIII;
+        if (level >= 30 && level <= 39) return config.roles.patriotIV;
+        if (level >= 40 && level <= 49) return config.roles.patriotV;
+        if (level >= 50 && level <= 59) return config.roles.patriotVI;
+        if (level >= 60 && level <= 69) return config.roles.patriotVII;
+        if (level >= 70 && level <= 79) return config.roles.patriotVIII;
+        if (level >= 80 && level <= 89) return config.roles.patriotIX;
+        if (level >= 90 && level <= 100) return config.roles.patriotX;
+        if (level > 100) return config.roles.magaLegend;
         return null;
     }
 
@@ -116,7 +117,7 @@ class LevelingSystem {
     // Update user roles based on their level
     async updateUserRoles(userId, guildId, level, guild) {
         try {
-            const config = require('../config');
+            const config = require('./config');
             const member = await guild.members.fetch(userId);
             
             if (!member) {
@@ -126,25 +127,25 @@ class LevelingSystem {
             const expectedRoleId = this.getRankRoleId(level);
             
             // Get all Patriot role IDs
-            const patriotRoles = {
-                patriotI: config.roles.patriotI,
-                patriotII: config.roles.patriotII,
-                patriotIII: config.roles.patriotIII,
-                patriotIV: config.roles.patriotIV,
-                patriotV: config.roles.patriotV,
-                patriotVI: config.roles.patriotVI,
-                patriotVII: config.roles.patriotVII,
-                patriotVIII: config.roles.patriotVIII,
-                patriotIX: config.roles.patriotIX,
-                patriotX: config.roles.patriotX
-            };
+            const patriotRoles = [
+                config.roles.patriotI,
+                config.roles.patriotII,
+                config.roles.patriotIII,
+                config.roles.patriotIV,
+                config.roles.patriotV,
+                config.roles.patriotVI,
+                config.roles.patriotVII,
+                config.roles.patriotVIII,
+                config.roles.patriotIX,
+                config.roles.patriotX
+            ];
 
             // Get MAGA Legend role ID
             const magaLegendRoleId = config.roles.magaLegend;
 
             if (!expectedRoleId) {
                 // User is level 0 or invalid, remove all patriot and maga legend roles
-                const allRoleIds = [...Object.values(patriotRoles), magaLegendRoleId];
+                const allRoleIds = [...patriotRoles, magaLegendRoleId];
                 for (const roleId of allRoleIds) {
                     if (member.roles.cache.has(roleId)) {
                         await member.roles.remove(roleId);
@@ -154,32 +155,23 @@ class LevelingSystem {
             }
 
             // Get the expected role
-            let expectedRole;
-            let actualRoleId;
-            
-            if (expectedRoleId === "magaLegend") {
-                expectedRole = guild.roles.cache.get(magaLegendRoleId);
-                actualRoleId = magaLegendRoleId;
-            } else {
-                expectedRole = guild.roles.cache.get(patriotRoles[expectedRoleId]);
-                actualRoleId = patriotRoles[expectedRoleId];
-            }
+            const expectedRole = guild.roles.cache.get(expectedRoleId);
             
             if (!expectedRole) {
                 return false;
             }
 
             // Remove all other patriot roles and MAGA Legend role
-            const allRoleIds = [...Object.values(patriotRoles), magaLegendRoleId];
+            const allRoleIds = [...patriotRoles, magaLegendRoleId];
             for (const roleId of allRoleIds) {
-                if (roleId !== actualRoleId && member.roles.cache.has(roleId)) {
+                if (roleId !== expectedRoleId && member.roles.cache.has(roleId)) {
                     await member.roles.remove(roleId);
                 }
             }
             
             // Add expected role if not already present
-            if (!member.roles.cache.has(actualRoleId)) {
-                await member.roles.add(actualRoleId);
+            if (!member.roles.cache.has(expectedRoleId)) {
+                await member.roles.add(expectedRoleId);
             }
 
             return true;

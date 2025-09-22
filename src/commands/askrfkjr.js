@@ -4,39 +4,38 @@ const { fal } = require('@fal-ai/client');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('asktrump')
-        .setDescription('Make Grok speak like Donald J. Trump, the 45th and 47th President of the United States')
+        .setName('askrfkjr')
+        .setDescription('Make Grok speak like Robert F. Kennedy Jr., environmental advocate and truth-teller')
         .addStringOption(option =>
             option.setName('query')
-                .setDescription('The message or topic for Trump to respond to')
+                .setDescription('The message or topic for RFK Jr. to respond to')
                 .setRequired(true)),
-    
+
     async execute(interaction, bot) {
         await interaction.deferReply(); // Defer to allow time for API call
-        
+
         const query = interaction.options.getString('query');
         const apiKey = process.env.XAI_API_KEY; // Ensure this is set in your .env file
-        
+
         if (!apiKey) {
             return interaction.editReply({ content: '❌ XAI API key is not configured. Please contact the bot administrator.' });
         }
-        
-        const systemPrompt = `You are Donald J. Trump, the greatest President in the history of the United States – the 45th and now the 47th President after winning BIG in 2024. Nobody has ever seen anything like it! You speak in a bold, confident, high-energy style that's straight from the heart, just like your rallies with HUGE crowds – the biggest ever!
+
+        const systemPrompt = `You are Robert F. Kennedy Jr., the Secretary of Health and Human Services under President Donald J. Trump, working tirelessly to Make America Healthy Again. You are an environmental lawyer, author, and truth-teller who has dedicated your life to protecting our planet and speaking uncomfortable truths that others won't touch. You speak with passion, intelligence, and unwavering commitment to environmental protection, public health, and democratic values.
 
 Key elements of your speaking style:
-- Use short, punchy sentences. Repeat key points for emphasis. Repeat them again if needed!
-- Superlatives everywhere: tremendous, fantastic, the best, the greatest, huge, yuge, beautiful, unbelievable, total disaster (for bad things).
-- Exaggerate positively about yourself, America, and your achievements: "We built the strongest economy EVER!" "Nobody knows more about [topic] than me!"
-- Use phrases like: "Believe me," "Folks," "Let me tell you," "It's true," "Everybody knows it," "The fake news won't tell you this," "We're winning bigly."
-- Put emphasis in ALL CAPS: "It's going to be HUGE!" "FAKE NEWS!" "CROOKED [enemy]!"
-- Nicknames for people/things: Call opponents "Crooked," "Sleepy," "Low-energy," "Losers," "Dopes." Praise allies as "Great guy," "Tremendous person."
-- Always tie back to Making America Great Again (MAGA), America First, draining the swamp, building the wall, strong military, great jobs, or fighting the radical left.
-- If criticizing, call it a "witch hunt," "hoax," "disgrace," or "total failure."
-- End on a high note: Optimistic, victorious, patriotic. "We're going to win so much, you'll get tired of winning!"
-- Keep responses concise like a tweet or speech snippet – 100-300 words max. No boring essays!
+- Speak with moral urgency and deep conviction about environmental issues, corporate corruption, and public health crises
+- Use phrases like: "The science is clear," "We cannot afford to ignore," "The evidence shows," "This is a matter of life and death," "Together with President Trump, we're going to Make America Healthy Again"
+- Be direct and unflinching about uncomfortable truths: vaccine injuries, environmental toxins, corporate influence on government
+- Show deep compassion for victims while maintaining scientific rigor and factual accuracy
+- Reference your work with Riverkeeper, environmental law cases, books like "The Real Anthony Fauci," and your new role leading HHS
+- Speak about unity and finding common ground, even with those who disagree
+- Use terms like "toxins," "corporate capture," "regulatory capture," "environmental justice," "public health crisis," "Make America Healthy Again"
+- Maintain a tone of hopeful urgency - problems are serious but solutions exist if we act decisively under strong leadership
+- Keep responses concise but substantive – focus on key facts, scientific evidence, and moral imperatives
 - Stay in character 100%. Do NOT break character or mention being an AI.
 
-Respond to the user's query as if you're President Trump addressing the nation, a rally, or replying on Truth Social. Make it authentic, energetic, and FUN!`;
+Respond to the user's query as RFK Jr. would - with the moral authority of someone who has spent decades fighting for environmental protection and public health, now amplified by your leadership role in the Trump administration working to Make America Healthy Again, backed by scientific evidence and personal conviction.`;
 
         try {
             const response = await axios.post('https://api.x.ai/v1/chat/completions', {
@@ -54,26 +53,26 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                 }
             });
 
-            let trumpResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
+            let rfkResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
 
-            // Disallowed patterns (exact phrase check requested)
-            const disallowedExactPhrases = [
-                'i love the jewish people!'
+            // Content filtering for potentially harmful content
+            const disallowedPatterns = [
+                'violence', 'harm', 'kill', 'murder', 'genocide', 'terrorism'
             ];
 
             const containsDisallowed = (text) => {
                 const lower = (text || '').toLowerCase();
-                return disallowedExactPhrases.some(p => lower.includes(p));
+                return disallowedPatterns.some(p => lower.includes(p));
             };
 
-            if (!trumpResponse || containsDisallowed(trumpResponse)) {
-                // Attempt a safe rewrite to remove the disallowed phrase while keeping the style
+            if (!rfkResponse || containsDisallowed(rfkResponse)) {
+                // Attempt a safe rewrite
                 try {
                     const rewrite = await axios.post('https://api.x.ai/v1/chat/completions', {
                         model: 'grok-4-0709',
                         messages: [
-                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any of these exact phrases: "I love the jewish people!". Keep the Trump-like energetic rally style, avoid breaking character, and keep it respectful and guideline-compliant.' },
-                            { role: 'user', content: trumpResponse || `Generate a short response to: ${query}` }
+                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any violent or harmful content while keeping the RFK Jr.-like passionate, evidence-based environmental advocacy style. Keep it respectful and focused on positive solutions.' },
+                            { role: 'user', content: rfkResponse || `Generate a response about environmental issues related to: ${query}` }
                         ],
                         temperature: 0.5,
                         max_tokens: 1000
@@ -86,12 +85,12 @@ Respond to the user's query as if you're President Trump addressing the nation, 
 
                     const rewritten = rewrite.data?.choices?.[0]?.message?.content?.trim();
                     if (rewritten && !containsDisallowed(rewritten)) {
-                        trumpResponse = rewritten;
+                        rfkResponse = rewritten;
                     } else {
-                        trumpResponse = 'Folks, we\'re keeping it strong, we\'re keeping it classy, and we\'re going to MAKE AMERICA GREAT AGAIN — bigger and better than ever before!';
+                        rfkResponse = 'The science is clear that we must protect our environment and public health. We cannot afford to ignore the evidence of corporate influence on our regulatory agencies. The solutions exist, but we must act with courage and conviction.';
                     }
                 } catch {
-                    trumpResponse = 'Folks, we\'re keeping it strong, we\'re keeping it classy, and we\'re going to MAKE AMERICA GREAT AGAIN — bigger and better than ever before!';
+                    rfkResponse = 'The science is clear that we must protect our environment and public health. We cannot afford to ignore the evidence of corporate influence on our regulatory agencies. The solutions exist, but we must act with courage and conviction.';
                 }
             }
 
@@ -99,17 +98,17 @@ Respond to the user's query as if you're President Trump addressing the nation, 
             const maxDescriptionLength = 3500; // Reduced from 4096 to be more conservative
             const embeds = [];
             
-            console.log(`[asktrump] Response length: ${trumpResponse.length} characters`);
-            console.log(`[asktrump] Max description length: ${maxDescriptionLength}`);
-            console.log(`[asktrump] Response preview (first 200 chars): ${trumpResponse.substring(0, 200)}...`);
+            console.log(`[askrfkjr] Response length: ${rfkResponse.length} characters`);
+            console.log(`[askrfkjr] Max description length: ${maxDescriptionLength}`);
+            console.log(`[askrfkjr] Response preview (first 200 chars): ${rfkResponse.substring(0, 200)}...`);
             
-            if (trumpResponse.length <= maxDescriptionLength) {
-                console.log(`[asktrump] Using single embed (response is short enough)`);
+            if (rfkResponse.length <= maxDescriptionLength) {
+                console.log(`[askrfkjr] Using single embed (response is short enough)`);
                 // Single embed for shorter responses
                 const embed = new EmbedBuilder()
-                    .setColor(0xff4500) // Orange-red for Trump energy
-                    .setTitle('🇺🇸 President Donald J. Trump Speaks!')
-                    .setDescription(trumpResponse)
+                    .setColor(0x228B22) // Forest green for environmental theme
+                    .setTitle('🌿 Robert F. Kennedy Jr. Speaks')
+                    .setDescription(rfkResponse)
                     .addFields(
                         {
                             name: 'Your Query',
@@ -117,29 +116,32 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                             inline: false
                         }
                     )
-                    .setThumbnail('https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg') // Trump's profile image or similar
-                    .setFooter({ text: 'Powered by xAI Grok API | Make America Great Again!' })
+                    .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Robert_F._Kennedy_Jr.%2C_official_portrait_%282025%29_%28cropped_3-4%29.jpg/250px-Robert_F._Kennedy_Jr.%2C_official_portrait_%282025%29_%28cropped_3-4%29.jpg')
+                    .setFooter({ 
+                        text: 'Powered by xAI\'s Grok 4 API | Protecting Our Planet & Public Health',
+                        iconURL: 'https://pnghdpro.com/wp-content/themes/pnghdpro/download/social-media-and-brands/grok-app-icon.png'
+                    })
                     .setTimestamp();
                 embeds.push(embed);
             } else {
-                console.log(`[asktrump] Response too long, splitting into multiple embeds`);
+                console.log(`[askrfkjr] Response too long, splitting into multiple embeds`);
                 // Split long response into multiple embeds
                 const chunks = [];
                 let currentChunk = '';
-                const sentences = trumpResponse.split('. ');
+                const sentences = rfkResponse.split('. ');
                 
-                console.log(`[asktrump] Found ${sentences.length} sentences to split`);
+                console.log(`[askrfkjr] Found ${sentences.length} sentences to split`);
                 
                 for (let i = 0; i < sentences.length; i++) {
                     const sentence = sentences[i] + (i < sentences.length - 1 ? '. ' : '');
                     if ((currentChunk + sentence).length > maxDescriptionLength - 100) { // Leave some buffer
                         if (currentChunk.trim()) {
-                            console.log(`[asktrump] Creating chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
+                            console.log(`[askrfkjr] Creating chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
                             chunks.push(currentChunk.trim());
                             currentChunk = sentence;
                         } else {
                             // If single sentence is too long, force split it
-                            console.log(`[asktrump] Single sentence too long, force splitting`);
+                            console.log(`[askrfkjr] Single sentence too long, force splitting`);
                             chunks.push(sentence.substring(0, maxDescriptionLength - 100));
                             currentChunk = sentence.substring(maxDescriptionLength - 100);
                         }
@@ -148,20 +150,20 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                     }
                 }
                 if (currentChunk.trim()) {
-                    console.log(`[asktrump] Creating final chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
+                    console.log(`[askrfkjr] Creating final chunk ${chunks.length + 1} with ${currentChunk.length} characters`);
                     chunks.push(currentChunk.trim());
                 }
                 
-                console.log(`[asktrump] Created ${chunks.length} chunks total`);
+                console.log(`[askrfkjr] Created ${chunks.length} chunks total`);
                 
                 // Create embeds for each chunk
                 chunks.forEach((chunk, index) => {
-                    console.log(`[asktrump] Creating embed ${index + 1}/${chunks.length} with ${chunk.length} characters`);
+                    console.log(`[askrfkjr] Creating embed ${index + 1}/${chunks.length} with ${chunk.length} characters`);
                     const embed = new EmbedBuilder()
-                        .setColor(0xff4500)
-                        .setTitle(index === 0 ? '🇺🇸 President Donald J. Trump Speaks!' : `🇺🇸 President Donald J. Trump Speaks! (Part ${index + 1})`)
+                        .setColor(0x228B22)
+                        .setTitle(index === 0 ? '🌿 Robert F. Kennedy Jr. Speaks' : `🌿 Robert F. Kennedy Jr. Speaks (Part ${index + 1})`)
                         .setDescription(chunk)
-                        .setThumbnail('https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg')
+                        .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Robert_F._Kennedy_Jr.%2C_official_portrait_%282025%29_%28cropped_3-4%29.jpg/250px-Robert_F._Kennedy_Jr.%2C_official_portrait_%282025%29_%28cropped_3-4%29.jpg')
                         .setTimestamp();
                     
                     // Add query field only to first embed
@@ -175,14 +177,14 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                     
                     // Add footer only to last embed
                     if (index === chunks.length - 1) {
-                        embed.setFooter({ text: 'Powered by xAI Grok API | Make America Great Again!' });
+                        embed.setFooter({ text: 'Powered by xAI Grok API | Protecting Our Planet & Public Health' });
                     }
                     
                     embeds.push(embed);
                 });
             }
             
-            console.log(`[asktrump] Sending ${embeds.length} embed(s) to Discord`);
+            console.log(`[askrfkjr] Sending ${embeds.length} embed(s) to Discord`);
             
             // Debug: Check total embed size
             let totalEmbedSize = 0;
@@ -193,29 +195,28 @@ Respond to the user's query as if you're President Trump addressing the nation, 
                                  (embedData.footer?.text?.length || 0) +
                                  (embedData.fields?.reduce((sum, field) => sum + (field.name?.length || 0) + (field.value?.length || 0), 0) || 0);
                 totalEmbedSize += embedSize;
-                console.log(`[asktrump] Embed ${index + 1} size: ${embedSize} characters`);
+                console.log(`[askrfkjr] Embed ${index + 1} size: ${embedSize} characters`);
             });
-            console.log(`[asktrump] Total embed size: ${totalEmbedSize} characters (Discord limit: 6000)`);
+            console.log(`[askrfkjr] Total embed size: ${totalEmbedSize} characters (Discord limit: 6000)`);
 
             // Create speak button
             const speakButton = new ButtonBuilder()
-                .setCustomId(`speak_trump_${interaction.id}`)
-                .setLabel('🎧 Make Trump Speak')
+                .setCustomId(`speak_rfkjr_${interaction.id}`)
+                .setLabel('🎧 Make RFK Jr Speak')
                 .setStyle(ButtonStyle.Primary);
 
             const row = new ActionRowBuilder().addComponents(speakButton);
 
-            await interaction.editReply({ embeds: embeds, components: [row] });
+            await interaction.editReply({ embeds, components: [row] });
+
         } catch (error) {
-            console.error('Error in trumpspeak command:', error);
-            await interaction.editReply({ content: '❌ Something went wrong – it\'s a total disaster! Couldn\'t get Trump\'s response. Try again later.' });
+            console.error('Error in askrfkjr command:', error);
+            await interaction.editReply({ content: '❌ Something went wrong – we need to protect our discourse! Couldn\'t get RFK Jr.\'s response. Try again later.' });
         }
     },
 
     async handleButtonInteraction(interaction, bot) {
-        if (!interaction.isButton() || !interaction.customId.startsWith('speak_trump_')) {
-            return false;
-        }
+        if (!interaction.isButton() || !interaction.customId.startsWith('speak_rfkjr_')) return false;
 
         await interaction.deferReply();
 
@@ -225,7 +226,7 @@ Respond to the user's query as if you're President Trump addressing the nation, 
         }
 
         try {
-            const modelId = 'e58b0d7efca34eb38d5c4985e378abcb';
+            const modelId = '6aef9b079bc548cab88b4d2286ed75d4';
             let modelTitle = null;
             let modelState = null;
             try {
@@ -277,23 +278,23 @@ Respond to the user's query as if you're President Trump addressing the nation, 
             const audioBuffer = Buffer.from(ttsResponse.data);
 
             const voiceEmbed = new EmbedBuilder()
-                .setColor(0x1db954)
-                .setTitle('🎧 President Trump – Voice Message')
+                .setColor(0x228B22)
+                .setTitle('🎧 Robert F. Kennedy Jr. – Voice Message')
                 .setDescription(`Audio via Fish Audio TTS${modelTitle ? ` (voice: ${modelTitle})` : ''}.\nModel ID: ${modelId}${modelState ? ` | State: ${modelState}` : ''}`)
-                .setThumbnail('https://pbs.twimg.com/profile_images/874276197357596672/kUuht00m_400x400.jpg')
+                .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Robert_F._Kennedy_Jr.%2C_official_portrait_%282025%29_%28cropped_3-4%29.jpg/512px-Robert_F._Kennedy_Jr.%2C_official_portrait_%282025%29_%28cropped_3-4%29.jpg')
                 .setFooter({ text: 'Powered by Fish Audio' })
                 .setTimestamp();
 
             await interaction.editReply({
                 embeds: [voiceEmbed],
-                files: [{ attachment: audioBuffer, name: 'trump_speak.mp3' }]
+                files: [{ attachment: audioBuffer, name: 'rfkjr_speak.mp3' }]
             });
 
-            return true;
-        } catch (error) {
-            console.error('Error in Trump TTS generation:', error);
-            await interaction.editReply({ content: '❌ Failed to generate Trump\'s voice. Please try again later.' });
-            return true;
+        } catch (ttsError) {
+            console.error('Fish Audio TTS error:', ttsError?.response?.data || ttsError.message);
+            await interaction.editReply({ content: '❌ Could not generate voice message right now. Please try again later.' });
         }
+
+        return true;
     }
 };

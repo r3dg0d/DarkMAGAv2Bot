@@ -9,6 +9,7 @@ class Database {
         this.chatRevivePath = path.join(this.dbPath, 'chat_revive.json');
         this.detainedRolesPath = path.join(this.dbPath, 'detained_roles.json');
         this.reactionRolesPath = path.join(this.dbPath, 'reaction_roles.json');
+        this.countingPath = path.join(this.dbPath, 'counting.json');
         this.ensureDatabase();
     }
 
@@ -37,6 +38,14 @@ class Database {
 
         if (!await fs.pathExists(this.reactionRolesPath)) {
             await fs.writeJson(this.reactionRolesPath, {});
+        }
+
+        if (!await fs.pathExists(this.countingPath)) {
+            await fs.writeJson(this.countingPath, {
+                currentCount: 0,
+                lastCounter: null,
+                lastCountTime: null
+            });
         }
     }
 
@@ -228,6 +237,27 @@ class Database {
             await fs.writeJson(this.reactionRolesPath, data, { spaces: 2 });
         } catch (error) {
             console.error('Error removing reaction role message:', error);
+        }
+    }
+
+    async getCountingData() {
+        try {
+            return await fs.readJson(this.countingPath);
+        } catch (error) {
+            console.error('Error reading counting data:', error);
+            return {
+                currentCount: 0,
+                lastCounter: null,
+                lastCountTime: null
+            };
+        }
+    }
+
+    async saveCountingData(countingData) {
+        try {
+            await fs.writeJson(this.countingPath, countingData, { spaces: 2 });
+        } catch (error) {
+            console.error('Error saving counting data:', error);
         }
     }
 }

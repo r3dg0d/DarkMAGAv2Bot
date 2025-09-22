@@ -24,6 +24,7 @@ module.exports = {
         patriotVIII: '1384594254189301830',
         patriotIX: '1384594282882666579',
         patriotX: '1384594303967559730',
+        magaLegend: '1396557820576403556',
         detained: '1375329848595058688'
     },
     

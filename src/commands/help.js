@@ -13,12 +13,22 @@ module.exports = {
             .addFields(
                 {
                     name: '🔧 General Commands',
-                    value: '`/ping` - Check bot latency\n`/help` - Show this help message\n`/userinfo` - Show detailed user information\n`/avatar` - Display user\'s avatar\n`/banner` - Display user\'s banner\n`/snipe` - Show last deleted message\n`/revivechat` - Send a chat revival message (2hr cooldown)\n`/imagegen` - Generate an image from a prompt\n`/editimage` - Edit an existing image with a prompt',
+                    value: '`/ping` - Check bot latency\n`/help` - Show this help message\n`/userinfo` - Show detailed user information\n`/avatar` - Display user\'s avatar\n`/banner` - Display user\'s banner\n`/snipe` - Show last deleted message\n`/revivechat` - Send a chat revival message (2hr cooldown)',
                     inline: false
                 },
                 {
-                    name: 'AI & Fun 🤖',
-                    value: '`/listvoicemodels` - List Fish Audio voice models (IDs and titles)\n`/trumpspeak` - Trump-style text response\n`/trumpspeakv2` - Trump-style text + voice follow-up\n`/elonspeak` - Elon Musk-style response\n`/kirkspeak` - Charlie Kirk-style response\n`/njfspeak` - America First pundit-style response',
+                    name: '🤖 AI Chat Commands',
+                    value: '`/askelon` - Chat with Elon Musk AI\n`/askjoerogan` - Chat with Joe Rogan AI\n`/askjdvance` - Chat with JD Vance AI\n`/asksamaltman` - Chat with Sam Altman AI\n`/askrfkjr` - Chat with RFK Jr AI\n`/asknjf` - Chat with Nick Fuentes AI\n`/askegirl` - Chat with E-Girl AI\n`/trumpspeak` - Chat with Trump AI',
+                    inline: false
+                },
+                {
+                    name: '🎤 Voice Generation Commands',
+                    value: '`/elonsay` - Elon\'s voice + lipsync video\n`/joerogansay` - Joe Rogan\'s voice + lipsync\n`/jdvancesay` - JD Vance\'s voice + lipsync\n`/samaltmansay` - Sam Altman\'s voice + lipsync\n`/rfkjrsay` - RFK Jr\'s voice + lipsync\n`/njfsay` - Nick Fuentes\' voice + lipsync\n`/egirlsay` - E-Girl\'s voice + lipsync\n`/trumpsay` - Trump\'s voice + lipsync',
+                    inline: false
+                },
+                {
+                    name: '🎨 AI Image Commands',
+                    value: '`/imagegen` - Generate images from text prompts\n`/editimage` - Edit existing images with AI\n`/uncensoredlm` - Uncensored AI responses (Trial Mod+)\n`/listvoicemodels` - List Fish Audio voice models',
                     inline: false
                 },
                 {
@@ -28,7 +38,7 @@ module.exports = {
                 },
                 {
                     name: '🛡️ Staff Commands',
-                    value: '**Executive Mod+:** `/ban` `/unban` `/purge` `/blockmodmail` `/unblockmodmail` `/blocklist` `/lockdown` `/unlock`\n**Mod+:** `/kick` `/detain` `/undetain`\n**Trial Mod+:** `/timeout` `/warn`\n**Staff:** `/addticketbuttons` - Add close/archive buttons to tickets',
+                    value: '**Executive Mod+:** `/ban` `/unban` `/purge` `/blockmodmail` `/unblockmodmail` `/blocklist` `/lockdown` `/unlock`\n**Mod+:** `/kick` `/detain` `/undetain`\n**Trial Mod+:** `/timeout` `/warn` `/verify` `/uncensoredlm`\n**Staff:** `/addticketbuttons` - Add close/archive buttons to tickets',
                     inline: false
                 },
                 {

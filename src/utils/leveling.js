@@ -56,7 +56,7 @@ class LevelingSystem {
         return await this.db.getUserLevel(userId, guildId);
     }
 
-    async updateUserLevel(userId, guildId) {
+    async updateUserLevel(userId, guildId, channelId = null) {
         // Check cooldown to prevent XP farming
         const cooldownKey = `${guildId}-${userId}`;
         const now = Date.now();
