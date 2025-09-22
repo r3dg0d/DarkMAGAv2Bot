@@ -16,22 +16,9 @@ module.exports = {
 
 		let text = interaction.options.getString('text');
 
-		// Basic content filter to avoid API rejections; redact rather than fail where possible
-		const blocked = [
-			'nuke', 'nuclear', 'bomb', 'terrorism', 'terrorist', 'assassinate', 'assassination',
-			'kill', 'murder', 'rape', 'genocide', 'suicide'
-		];
-		const containsBlocked = (input) => {
-			const lower = (input || '').toLowerCase();
-			return blocked.some(w => lower.includes(w));
-		};
-		if (containsBlocked(text)) {
-			blocked.forEach(w => {
-				text = text.replace(new RegExp(w, 'gi'), '[REDACTED]');
-			});
-			if (text.replace(/\[REDACTED\]/g, '').trim().length < 10) {
-				return interaction.editReply({ content: '❌ The requested text cannot be processed. Please try different wording.' });
-			}
+		// Check character limit
+		if (text.length > 75) {
+			return interaction.editReply({ content: '❌ Text is too long! Please keep it under 75 characters.' });
 		}
 
 		const fishApiKey = process.env.FISHAUDIO_API;

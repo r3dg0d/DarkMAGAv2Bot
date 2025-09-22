@@ -16,17 +16,9 @@ module.exports = {
         
         let text = interaction.options.getString('text');
 
-        // Basic safety filter similar to others
-        const badWords = [
-            'rape','assault','non-con','noncon','forced','child','minor','underage','pedophile','pedo',
-            'kill','murder','bomb','explosive','terror','terrorist'
-        ];
-        const containsBadWord = (input) => badWords.some(w => (input || '').toLowerCase().includes(w));
-        if (containsBadWord(text)) {
-            badWords.forEach(w => { text = text.replace(new RegExp(w, 'gi'), '[REDACTED]'); });
-            if (text.replace(/\[REDACTED\]/g, '').trim().length < 10) {
-                return interaction.editReply({ content: '❌ The requested text contains disallowed content. Please rephrase.' });
-            }
+        // Check character limit
+        if (text.length > 75) {
+            return interaction.editReply({ content: '❌ Text is too long! Please keep it under 75 characters.' });
         }
 
         const fishApiKey = process.env.FISHAUDIO_API;

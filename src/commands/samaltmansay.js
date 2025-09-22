@@ -16,32 +16,9 @@ module.exports = {
         
         let text = interaction.options.getString('text');
 
-        // Content filtering to avoid censored words that might break lipsync
-        const badWords = [
-            'nuke', 'nuclear', 'bomb', 'terrorism', 'terrorist', 'assassinate', 'assassination',
-            'kill', 'murder', 'rape', 'genocide', 'holocaust', 'hitler', 'isis', 'taliban',
-            'isis', 'al-qaeda', 'suicide', 'pedophile', 'child abuse', 'hate israel',
-            'i hate israel', 'we need to nuke', 'blank nuke', 'fuck israel', 'hate jews'
-        ];
-
-        const containsBadWord = (input) => {
-            const lowerInput = input.toLowerCase();
-            return badWords.some(word => lowerInput.includes(word.toLowerCase()));
-        };
-
-        if (containsBadWord(text)) {
-            // Try to sanitize the text by replacing bad words
-            badWords.forEach(word => {
-                text = text.replace(new RegExp(word, 'gi'), '[REDACTED]');
-            });
-
-            // If the text is now mostly redacted, provide a fallback
-            if (text.replace(/\[REDACTED\]/g, '').trim().length < 10) {
-                return interaction.editReply({
-                    content: '❌ The requested text contains content that cannot be processed. Please try with different wording.',
-                    embeds: []
-                });
-            }
+        // Check character limit
+        if (text.length > 75) {
+            return interaction.editReply({ content: '❌ Text is too long! Please keep it under 75 characters.' });
         }
 
         // Check if Fish Audio API is available

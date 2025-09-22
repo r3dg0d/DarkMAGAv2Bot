@@ -5,7 +5,7 @@ const { fal } = require('@fal-ai/client');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('egirlsay')
-        .setDescription('Make the e-girl voice say your exact text (SFW, cozy vibes)')
+        .setDescription('Make the e-girl voice say your exact text (NSFW, flirty vibes)')
         .addStringOption(option =>
             option.setName('text')
                 .setDescription('The exact text you want the e-girl to say')
@@ -16,18 +16,9 @@ module.exports = {
         
         let text = interaction.options.getString('text');
 
-        // SFW filter
-        const badWords = [
-            'rape', 'assault', 'non-con', 'noncon', 'force', 'forced', 'child', 'minor', 'underage', 'pedophile', 'pedo', 'kill', 'murder', 'bomb', 'explosive', 'hack', 'phish', 'terror'
-        ];
-        const containsBadWord = (input) => badWords.some(w => (input || '').toLowerCase().includes(w));
-        if (containsBadWord(text)) {
-            badWords.forEach(w => {
-                text = text.replace(new RegExp(w, 'gi'), '[REDACTED]');
-            });
-            if (text.replace(/\[REDACTED\]/g, '').trim().length < 10) {
-                return interaction.editReply({ content: '❌ That text can\'t be processed. Please keep it SFW and try again.' });
-            }
+        // Check character limit
+        if (text.length > 75) {
+            return interaction.editReply({ content: '❌ Text is too long! Please keep it under 75 characters.' });
         }
 
         const fishApiKey = process.env.FISHAUDIO_API;
