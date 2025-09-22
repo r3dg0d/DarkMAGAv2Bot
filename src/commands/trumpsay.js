@@ -131,6 +131,14 @@ module.exports = {
                     // Set FAL API key
                     fal.config({ credentials: falApiKey });
 
+                    // Show generating message
+                    const generatingEmbed = new EmbedBuilder()
+                        .setColor(0xffa500)
+                        .setTitle('🎬 Generating Lipsync Video...')
+                        .setDescription('Creating AI lipsync video using fal.ai veed/fabric-1.0 model')
+                        .setTimestamp();
+                    const generatingMessage = await interaction.followUp({ embeds: [generatingEmbed] });
+
                     // Upload audio to fal.ai storage
                     const audioFile = new File([audioBuffer], 'trumpsay.mp3', { type: 'audio/mpeg' });
                     const audioUrl = await fal.storage.upload(audioFile);
@@ -146,9 +154,21 @@ module.exports = {
                         onQueueUpdate: (update) => {
                             if (update.status === "IN_PROGRESS") {
                                 update.logs.map((log) => log.message).forEach(console.log);
+                                // Update the generating message with progress
+                                try {
+                                    const progressEmbed = new EmbedBuilder()
+                                        .setColor(0xffa500)
+                                        .setTitle('🎬 Generating Lipsync Video...')
+                                        .setDescription(`Creating AI lipsync video using fal.ai veed/fabric-1.0 model\n\n**Progress:** ${update.logs.map((log) => log.message).join('\n')}`)
+                                        .setTimestamp();
+                                    generatingMessage.edit({ embeds: [progressEmbed] });
+                                } catch (editError) {
+                                    console.error('Failed to update progress message:', editError);
+                                }
                             }
                         },
                     });
+                    console.log('Video generation completed:', videoResult.data?.video?.url ? 'Success' : 'Failed');
 
                     if (videoResult.data?.video?.url) {
                         // Download the video file from the URL
@@ -186,14 +206,27 @@ module.exports = {
                     }
                 } catch (lipsyncError) {
                     console.error('Lipsync video generation error:', lipsyncError?.response?.data || lipsyncError.message);
+                    
+                    // Try to update the generating message with error info
                     try {
                         const failEmbed = new EmbedBuilder()
-                            .setColor(0xffa500)
+                            .setColor(0xff0000)
                             .setTitle('🎬 Lipsync Video Failed')
-                            .setDescription('Could not generate lipsync video right now. The audio is still available above.')
+                            .setDescription(`Could not generate lipsync video: ${lipsyncError?.message || 'Unknown error'}\n\nThe audio is still available above.`)
+                            .addFields({ name: 'Error Details', value: lipsyncError?.response?.data ? JSON.stringify(lipsyncError.response.data) : 'No additional details', inline: false })
                             .setTimestamp();
-                        await interaction.followUp({ embeds: [failEmbed] });
-                    } catch (_) { /* ignore follow-up errors */ }
+                        await generatingMessage.edit({ embeds: [failEmbed] });
+                    } catch (editError) {
+                        console.error('Failed to update error message:', editError);
+                        try {
+                            const failEmbed = new EmbedBuilder()
+                                .setColor(0xff0000)
+                                .setTitle('🎬 Lipsync Video Failed')
+                                .setDescription('Could not generate lipsync video right now. The audio is still available above.')
+                                .setTimestamp();
+                            await interaction.followUp({ embeds: [failEmbed] });
+                        } catch (_) {}
+                    }
                 }
             }
 
