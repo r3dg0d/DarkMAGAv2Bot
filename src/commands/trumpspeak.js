@@ -56,45 +56,6 @@ Respond to the user's query as if you're President Trump addressing the nation, 
 
             let trumpResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
 
-            // Disallowed patterns (exact phrase check requested)
-            const disallowedExactPhrases = [
-                'i love the jewish people!'
-            ];
-
-            const containsDisallowed = (text) => {
-                const lower = (text || '').toLowerCase();
-                return disallowedExactPhrases.some(p => lower.includes(p));
-            };
-
-            if (!trumpResponse || containsDisallowed(trumpResponse)) {
-                // Attempt a safe rewrite to remove the disallowed phrase while keeping the style
-                try {
-                    const rewrite = await axios.post('https://api.x.ai/v1/chat/completions', {
-                        model: 'grok-4-0709',
-                        messages: [
-                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any of these exact phrases: "I love the jewish people!". Keep the Trump-like energetic rally style, avoid breaking character, and keep it respectful and guideline-compliant.' },
-                            { role: 'user', content: trumpResponse || `Generate a short response to: ${query}` }
-                        ],
-                        temperature: 0.5,
-                        max_tokens: 1000
-                    }, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        }
-                    });
-
-                    const rewritten = rewrite.data?.choices?.[0]?.message?.content?.trim();
-                    if (rewritten && !containsDisallowed(rewritten)) {
-                        trumpResponse = rewritten;
-                    } else {
-                        trumpResponse = 'Folks, we\'re keeping it strong, we\'re keeping it classy, and we\'re going to MAKE AMERICA GREAT AGAIN — bigger and better than ever before!';
-                    }
-                } catch {
-                    trumpResponse = 'Folks, we\'re keeping it strong, we\'re keeping it classy, and we\'re going to MAKE AMERICA GREAT AGAIN — bigger and better than ever before!';
-                }
-            }
-
             // Handle long responses by splitting into multiple embeds if needed
             const maxDescriptionLength = 3500; // Reduced from 4096 to be more conservative
             const embeds = [];

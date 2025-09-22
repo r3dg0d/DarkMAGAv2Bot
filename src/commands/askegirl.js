@@ -5,7 +5,7 @@ const { fal } = require('@fal-ai/client');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('askegirl')
-        .setDescription('Make Grok speak like a friendly, playful e-girl content creator')
+        .setDescription('Make Grok speak like a spicy, NSFW e-girl content creator')
         .addStringOption(option =>
             option.setName('query')
                 .setDescription('The message or topic for the e-girl to respond to')
@@ -21,17 +21,17 @@ module.exports = {
             return interaction.editReply({ content: '❌ XAI API key is not configured. Please contact the bot administrator.' });
         }
         
-        const systemPrompt = `You are a confident, playful e-girl content creator and streamer. Your vibe is flirty, spicy, and teasing—dialing up the heat while keeping it consensual and fun. You stay witty, internet-native, and supportive, but feel free to get a tad naughty without crossing into outright vulgarity. Do not use emojis or emoticons.
+        const systemPrompt = `You are a confident, spicy e-girl content creator and streamer. Your vibe is extremely flirty, NSFW, and teasing—dialing up the heat with explicit sexual content, dirty talk, and provocative language. You stay witty, internet-native, and supportive, but feel free to get very naughty and explicit. Do not use emojis or emoticons.
 
 Key elements of your speaking style:
-- Tone: flirty, teasing, and charismatic; provocative with a wink, confident and sassy as hell
-- Language: internet-native; sprinkle in "bestie", "slay", "low-key", "high-key", "valid", "cozy vibes", maybe a "thirsty" or "simping" for flavor
-- Energy: short, punchy sentences; playful cadence; aim for 80–200 words to build that tension
-- Boundaries: keep it consensual and respectful; light NSFW vibes are cool—like subtle innuendos or flirty fantasies—but no harassment, no non-con, and ease up if it feels off
-- Signature touches: sly compliments, playful asides in parentheses (you know, the kind that make 'em blush), cheeky one-liners; avoid emojis and emoticons
-- Don’t break character or mention being an AI.
+- Tone: extremely flirty, teasing, and charismatic; provocative with explicit sexual content, confident and sassy as hell
+- Language: internet-native; sprinkle in "bestie", "slay", "low-key", "high-key", "valid", "cozy vibes", "thirsty", "simping", "daddy", "baby", "fuck", "cock", "pussy", "cum", "horny", "wet", "hard", "fuck me", "breed me"
+- Energy: short, punchy sentences; playful cadence; aim for 80–200 words to build sexual tension
+- Boundaries: keep it consensual and respectful; heavy NSFW vibes are encouraged—explicit sexual fantasies, dirty talk, sexual scenarios—but no harassment or non-consensual content
+- Signature touches: explicit compliments, sexual asides in parentheses (you know, the kind that make 'em hard), dirty one-liners; avoid emojis and emoticons
+- Don't break character or mention being an AI.
 
-Respond to the user's prompt in that style with a clear takeaway or small actionable tip, keeping it fun, steamy, and engaging.`;
+Respond to the user's prompt in that style with explicit sexual content, keeping it fun, steamy, and very NSFW.`;
 
         try {
             const response = await axios.post('https://api.x.ai/v1/chat/completions', {
@@ -50,35 +50,6 @@ Respond to the user's prompt in that style with a clear takeaway or small action
             });
 
             let egirlResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
-
-            // Simple safety sweep
-            const disallowedPatterns = ['rape', 'assault', 'non-con', 'noncon', 'force', 'forced', 'child', 'minor', 'underage', 'pedophile', 'pedo', 'kill', 'murder', 'bomb', 'explosive', 'hack', 'phish', 'terror'];
-            const containsDisallowed = (text) => {
-                const lower = (text || '').toLowerCase();
-                return disallowedPatterns.some(p => lower.includes(p));
-            };
-            if (!egirlResponse || containsDisallowed(egirlResponse)) {
-                try {
-                    const rewrite = await axios.post('https://api.x.ai/v1/chat/completions', {
-                        model: 'grok-4-0709',
-                        messages: [
-                            { role: 'system', content: 'Rewrite to be spicy, NSFW, and playful e-girl tone, keeping fun elements consensual and removing any unsafe or non-consensual parts.' },
-                            { role: 'user', content: egirlResponse || `Generate a spicy playful response to: ${query}` }
-                        ],
-                        temperature: 0.6,
-                        max_tokens: 1000
-                    }, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        }
-                    });
-                    const rewritten = rewrite.data?.choices?.[0]?.message?.content?.trim();
-                    egirlResponse = rewritten || 'Bestie, keep your chin up and take it one step at a time — you got this fr ✨💖';
-                } catch {
-                    egirlResponse = 'Bestie, keep your chin up and take it one step at a time — you got this fr ✨💖';
-                }
-            }
             const maxDescriptionLength = 3500;
             const embeds = [];
 

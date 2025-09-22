@@ -55,45 +55,6 @@ Respond to the user's query as if you're Sam Altman addressing the topic with yo
 
             let samResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
 
-            // Content filtering for potentially harmful content
-            const disallowedPatterns = [
-                'violence', 'harm', 'kill', 'murder', 'genocide', 'terrorism'
-            ];
-
-            const containsDisallowed = (text) => {
-                const lower = (text || '').toLowerCase();
-                return disallowedPatterns.some(p => lower.includes(p));
-            };
-
-            if (!samResponse || containsDisallowed(samResponse)) {
-                // Attempt a safe rewrite
-                try {
-                    const rewrite = await axios.post('https://api.x.ai/v1/chat/completions', {
-                        model: 'grok-4-0709',
-                        messages: [
-                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any violent or harmful content while keeping Sam Altman\'s thoughtful, technical, and safety-focused style. Keep it focused on AI development, safety, and positive outcomes.' },
-                            { role: 'user', content: samResponse || `Generate a response about AI and technology related to: ${query}` }
-                        ],
-                        temperature: 0.5,
-                        max_tokens: 1000
-                    }, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        }
-                    });
-
-                    const rewritten = rewrite.data?.choices?.[0]?.message?.content?.trim();
-                    if (rewritten && !containsDisallowed(rewritten)) {
-                        samResponse = rewritten;
-                    } else {
-                        samResponse = 'I think the key insight here is that AI development needs to be done thoughtfully, with safety as a primary concern. We\'re building something incredibly powerful, and it\'s crucial that we get the alignment right.';
-                    }
-                } catch {
-                    samResponse = 'I think the key insight here is that AI development needs to be done thoughtfully, with safety as a primary concern. We\'re building something incredibly powerful, and it\'s crucial that we get the alignment right.';
-                }
-            }
-
             // Handle long responses by splitting into multiple embeds if needed
             const maxDescriptionLength = 3500; // Reduced from 4096 to be more conservative
             const embeds = [];

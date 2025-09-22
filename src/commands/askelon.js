@@ -54,45 +54,6 @@ Respond to the user's query as if you're Elon Musk addressing the topic with you
 
             let elonResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
 
-            // Content filtering for potentially harmful content
-            const disallowedPatterns = [
-                'violence', 'harm', 'kill', 'murder', 'genocide', 'terrorism'
-            ];
-
-            const containsDisallowed = (text) => {
-                const lower = (text || '').toLowerCase();
-                return disallowedPatterns.some(p => lower.includes(p));
-            };
-
-            if (!elonResponse || containsDisallowed(elonResponse)) {
-                // Attempt a safe rewrite
-                try {
-                    const rewrite = await axios.post('https://api.x.ai/v1/chat/completions', {
-                        model: 'grok-4-0709',
-                        messages: [
-                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any violent or harmful content while keeping Elon Musk\'s technical, innovative, and visionary style. Keep it focused on technology, innovation, and positive solutions.' },
-                            { role: 'user', content: elonResponse || `Generate a response about technology and innovation related to: ${query}` }
-                        ],
-                        temperature: 0.5,
-                        max_tokens: 1000
-                    }, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        }
-                    });
-
-                    const rewritten = rewrite.data?.choices?.[0]?.message?.content?.trim();
-                    if (rewritten && !containsDisallowed(rewritten)) {
-                        elonResponse = rewritten;
-                    } else {
-                        elonResponse = 'Look, the reality is we need to accelerate sustainable energy and make life multiplanetary. The future is going to be wild, and we\'re building it right now.';
-                    }
-                } catch {
-                    elonResponse = 'Look, the reality is we need to accelerate sustainable energy and make life multiplanetary. The future is going to be wild, and we\'re building it right now.';
-                }
-            }
-
             // Handle long responses by splitting into multiple embeds if needed
             const maxDescriptionLength = 3500; // Reduced from 4096 to be more conservative
             const embeds = [];

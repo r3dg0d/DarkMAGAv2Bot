@@ -55,45 +55,6 @@ Respond to the user's query as RFK Jr. would - with the moral authority of someo
 
             let rfkResponse = response.data?.choices?.[0]?.message?.content?.trim() || '';
 
-            // Content filtering for potentially harmful content
-            const disallowedPatterns = [
-                'violence', 'harm', 'kill', 'murder', 'genocide', 'terrorism'
-            ];
-
-            const containsDisallowed = (text) => {
-                const lower = (text || '').toLowerCase();
-                return disallowedPatterns.some(p => lower.includes(p));
-            };
-
-            if (!rfkResponse || containsDisallowed(rfkResponse)) {
-                // Attempt a safe rewrite
-                try {
-                    const rewrite = await axios.post('https://api.x.ai/v1/chat/completions', {
-                        model: 'grok-4-0709',
-                        messages: [
-                            { role: 'system', content: 'You are an editor. Rewrite the text to remove any violent or harmful content while keeping the RFK Jr.-like passionate, evidence-based environmental advocacy style. Keep it respectful and focused on positive solutions.' },
-                            { role: 'user', content: rfkResponse || `Generate a response about environmental issues related to: ${query}` }
-                        ],
-                        temperature: 0.5,
-                        max_tokens: 1000
-                    }, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        }
-                    });
-
-                    const rewritten = rewrite.data?.choices?.[0]?.message?.content?.trim();
-                    if (rewritten && !containsDisallowed(rewritten)) {
-                        rfkResponse = rewritten;
-                    } else {
-                        rfkResponse = 'The science is clear that we must protect our environment and public health. We cannot afford to ignore the evidence of corporate influence on our regulatory agencies. The solutions exist, but we must act with courage and conviction.';
-                    }
-                } catch {
-                    rfkResponse = 'The science is clear that we must protect our environment and public health. We cannot afford to ignore the evidence of corporate influence on our regulatory agencies. The solutions exist, but we must act with courage and conviction.';
-                }
-            }
-
             // Handle long responses by splitting into multiple embeds if needed
             const maxDescriptionLength = 3500; // Reduced from 4096 to be more conservative
             const embeds = [];
