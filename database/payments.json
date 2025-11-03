@@ -1,0 +1,54 @@
+{
+  "1328664730969313280-688507704054120456": {
+    "status": "completed",
+    "amount": 25,
+    "currency": "USD",
+    "reference": "DMG-280-456-DF98G3",
+    "invoiceId": "INV2-YLKB-ESJE-F2NN-EXDF",
+    "invoiceUrl": "https://www.sandbox.paypal.com/invoice/p/#INV2-YLKB-ESJE-F2NN-EXDF",
+    "description": "Dark MAGA Bot - AI Features Access (One-time Payment)",
+    "userId": "688507704054120456",
+    "guildId": "1328664730969313280",
+    "createdAt": "2025-10-08T21:08:26.328Z",
+    "transactionId": "INV2-YLKB-ESJE-F2NN-EXDF",
+    "updatedAt": "2025-10-08T21:16:07.091Z"
+  },
+  "1328664730969313280-1036756375528800447": {
+    "status": "completed",
+    "amount": 25,
+    "currency": "USD",
+    "reference": "DMG-280-447-BIJ95F",
+    "invoiceId": "7FA8076969004091U",
+    "invoiceUrl": "https://www.paypal.com/checkoutnow?token=7FA8076969004091U",
+    "description": "Dark MAGA Bot - AI Features Access (One-time Payment)",
+    "userId": "1036756375528800447",
+    "guildId": "1328664730969313280",
+    "createdAt": "2025-10-08T22:35:04.184Z",
+    "transactionId": "7FA8076969004091U",
+    "updatedAt": "2025-10-08T22:36:48.458Z"
+  },
+  "1328664730969313280-758736789665480766": {
+    "status": "completed",
+    "amount": 25,
+    "currency": "USD",
+    "reference": "MANUAL-1761018347121-GH5RPJ",
+    "description": "Dark MAGA Bot - AI Features Access (Manually Granted)",
+    "grantedBy": "758736789665480766",
+    "grantedAt": "2025-10-21T03:45:47.121Z",
+    "userId": "758736789665480766",
+    "guildId": "1328664730969313280",
+    "createdAt": "2025-10-21T03:45:47.121Z"
+  },
+  "1328664730969313280-1419905383396544543": {
+    "status": "pending",
+    "amount": 25,
+    "currency": "USD",
+    "reference": "DMG-280-543-LWGQT2",
+    "invoiceId": "0YX37799PA790623H",
+    "invoiceUrl": "https://www.paypal.com/checkoutnow?token=0YX37799PA790623H",
+    "description": "Dark MAGA Bot - AI Features Access (One-time Payment)",
+    "userId": "1419905383396544543",
+    "guildId": "1328664730969313280",
+    "createdAt": "2025-10-08T23:34:00.186Z"
+  }
+}
