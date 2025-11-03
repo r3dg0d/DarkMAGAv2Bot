@@ -111,9 +111,11 @@ The bot runs two separate bots simultaneously:
 
 3. **Set up environment variables**
    ```bash
-   cp .env.example .env
+   cp env.example .env
    ```
-   Edit `.env` with your configuration:
+   Edit `.env` with your configuration. See sections below for detailed setup instructions.
+
+   **Basic Discord Configuration:**
    ```env
    DISCORD_TOKEN=your_discord_bot_token
    CLIENT_ID=your_bot_client_id
@@ -122,12 +124,18 @@ The bot runs two separate bots simultaneously:
    TICKET_CATEGORY_ID=your_ticket_category_id
    CHAT_REVIVE_CHANNELS=channel_id1,channel_id2,channel_id3
    CHAT_REVIVE_ENABLED=true
-   FLUX_API_KEY=your_bfl_api_key
-   XAI_API_KEY=
-   FISHAUDIO_API=
-   UNCENSORED_API_KEY=your_uncensored_api_key
-   
-   # Auto-Poster (Optional - user account token for Python selfbot)
+   ```
+
+   **AI API Keys:**
+   ```env
+   FLUX_API_KEY=your_bfl_api_key          # For image generation
+   XAI_API_KEY=your_xai_api_key            # For AI chat features
+   FISHAUDIO_API=your_fish_audio_api_key   # For voice generation
+   UNCENSORED_API_KEY=your_uncensored_api_key  # For uncensored AI
+   ```
+
+   **Auto-Poster (Optional - user account token for Python selfbot):**
+   ```env
    # ⚠️ WARNING: Self-bots violate Discord ToS - use at your own risk
    # Get token from browser DevTools > Application > Local Storage > token
    SELF_BOT_TOKEN=your_discord_user_token
@@ -206,6 +214,87 @@ The bot uses SQLite for data persistence:
 - Reaction role message mappings
 - Ticket mappings
 
+## PayPal Payment Setup
+
+The bot includes a premium payment system using PayPal. Follow these steps to set it up:
+
+### 1. Create a PayPal Business Account
+
+1. Go to [PayPal Business](https://www.paypal.com/business) and sign up
+2. Complete the business account verification process
+3. Verify your business email address
+
+### 2. Create a PayPal App
+
+1. Log into your [PayPal Developer Dashboard](https://developer.paypal.com/)
+2. Click **"Create App"** or go to **"My Apps & Credentials"**
+3. Choose **"Merchant"** as the app type
+4. Enter an app name (e.g., "Dark MAGA Bot")
+5. Click **"Create App"**
+
+### 3. Get Your API Credentials
+
+After creating the app, you'll see:
+- **Client ID** - Copy this
+- **Secret** - Click "Show" to reveal and copy this
+- **Merchant Email** - Your PayPal business account email
+
+### 4. Configure Environment Variables
+
+Add these to your `.env` file:
+
+```env
+# PayPal API Configuration
+PAYPAL_CLIENT_ID=your_client_id_from_paypal_developer_dashboard
+PAYPAL_CLIENT_SECRET=your_secret_from_paypal_developer_dashboard
+PAYPAL_MERCHANT_EMAIL=your_paypal_business_email@example.com
+PAYPAL_MODE=sandbox
+# Use 'sandbox' for testing, 'production' for live payments
+```
+
+### 5. Set Up PayPal Webhooks (Optional but Recommended)
+
+Webhooks allow PayPal to notify your bot when payments are completed:
+
+1. In PayPal Developer Dashboard, go to your app
+2. Scroll to **"Webhooks"** section
+3. Click **"Add Webhook"**
+4. Enter your webhook URL:
+   - **Local testing:** Use ngrok or similar: `https://your-ngrok-url.ngrok.io/webhooks/paypal`
+   - **Production:** Your public server URL: `https://yourdomain.com/webhooks/paypal`
+5. Select events to listen for:
+   - `CHECKOUT.ORDER.COMPLETED`
+   - `PAYMENT.CAPTURE.COMPLETED`
+   - `INVOICING.INVOICE.PAID`
+6. Copy the **Webhook ID** and add to `.env`:
+   ```env
+   PAYPAL_WEBHOOK_ID=your_webhook_id_here
+   ```
+
+### 6. Testing Payments
+
+**Sandbox Mode:**
+1. Use PayPal sandbox test accounts from the Developer Dashboard
+2. Create test buyer and seller accounts
+3. Test payments using the test accounts
+4. Verify payments are processed correctly
+
+**Production Mode:**
+1. Change `PAYPAL_MODE=production` in `.env`
+2. Use your live PayPal business account credentials
+3. Real payments will be processed
+
+### 7. Webhook Server Setup (Optional)
+
+If you want to use webhooks for instant payment verification:
+
+1. The bot supports webhook endpoints (see `src/webhooks/paypal.js`)
+2. Set up an Express server to handle webhook requests
+3. Make sure your server is accessible from the internet
+4. Configure the webhook URL in PayPal Developer Dashboard
+
+**Note:** Without webhooks, the bot uses polling to check payment status. Webhooks provide faster, more reliable payment verification.
+
 ## Configuration
 
 Key configuration options in `src/config.js`:
@@ -214,6 +303,7 @@ Key configuration options in `src/config.js`:
 - API keys for external services
 - Chat revive settings
 - File paths for data storage
+- PayPal API credentials and settings
 
 ## Contributing
 
