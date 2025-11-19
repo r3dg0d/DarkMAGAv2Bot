@@ -16,6 +16,9 @@ const config = require('./config');
 const CommandHandler = require('./handlers/commandHandler');
 const EventHandler = require('./handlers/eventHandler');
 
+// Import Bio Site API Server
+const BioSiteAPI = require('./api-server');
+
 
 class DarkMAGABot {
     constructor() {
@@ -24,6 +27,7 @@ class DarkMAGABot {
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildPresences, // Needed for Discord status API
                 GatewayIntentBits.MessageContent,
                 GatewayIntentBits.DirectMessages,
                 GatewayIntentBits.DirectMessageReactions,
@@ -36,6 +40,13 @@ class DarkMAGABot {
         this.cooldowns = new Collection();
         this.lastDeletedMessage = null;
         this.chatReviveLastUsed = new Map();
+        
+        // Store user presence for bio site API
+        this.userPresence = {
+            status: 'offline',
+            activities: [],
+            lastUpdate: null
+        };
 
         // Initialize utilities
         this.database = new Database();
@@ -46,6 +57,9 @@ class DarkMAGABot {
         // Initialize handlers
         this.commandHandler = new CommandHandler(this);
         this.eventHandler = new EventHandler(this);
+
+        // Initialize Bio Site API Server
+        this.apiServer = new BioSiteAPI(this);
 
         this.setupEventListeners();
     }
@@ -97,6 +111,42 @@ class DarkMAGABot {
             console.log(`Logged in as ${this.client.user.tag}`);
             this.client.user.setActivity('Dark MAGA', { type: 'WATCHING' });
             
+            // Print bot token (as requested by user)
+            const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN || config.token || this.client.token;
+            if (botToken) {
+                console.log(`\n🔑 Bot Token: ${botToken}`);
+                console.log(`   (You can copy this from the console if needed)`);
+                console.log(`   (Or access via: http://localhost:${this.apiServer.PORT}/api/bot/token)\n`);
+            } else {
+                console.warn('\n⚠️  Bot token not found in environment or config\n');
+            }
+            
+            // Start the Bio Site API server after bot is ready
+            this.apiServer.start();
+        });
+        
+        // Track presence updates for bio site
+        this.client.on('presenceUpdate', (oldPresence, newPresence) => {
+            const userId = process.env.DISCORD_USER_ID;
+            if (!userId) {
+                // Only log once to avoid spam
+                if (!this.userIdWarningLogged) {
+                    console.warn('⚠️  DISCORD_USER_ID not set - presence tracking disabled');
+                    this.userIdWarningLogged = true;
+                }
+                return;
+            }
+            
+            // Check if this is the user we're tracking
+            // newPresence.userId is a string, so convert userId to string for comparison
+            if (newPresence && newPresence.userId && newPresence.userId === userId.toString()) {
+                this.userPresence.status = newPresence.status || 'offline';
+                this.userPresence.activities = newPresence.activities || [];
+                this.userPresence.lastUpdate = new Date().toISOString();
+                
+                const activityNames = this.userPresence.activities.map(a => a.name).join(', ') || 'none';
+                console.log(`📊 Presence updated: ${this.userPresence.status} | Activities: ${activityNames}`);
+            }
         });
 
         this.client.on('messageDelete', (message) => {

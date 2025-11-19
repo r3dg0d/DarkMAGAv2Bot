@@ -39,3 +39,16 @@ build/
 *.tmp
 *.bak
 
+
+# Sensitive/Unneeded files
+get-refresh-token.js
+exchange-code.js
+selfbot.py
+SPOTIFY_AUTH_URL.txt
+start.bat
+start.sh
+prepare-for-cpanel.sh
+BIO_SITE_SETUP.md
+CPANEL_DEPLOYMENT.md
+QUICK_START_CPANEL.md
+SPOTIFY_SETUP.md

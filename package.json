@@ -4,8 +4,8 @@
   "description": "Dark MAGA Discord Bot - Node.js Version",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "deploy": "node src/deploy-commands.js"
   },
   "keywords": [
@@ -20,6 +20,7 @@
     "@fal-ai/client": "^1.6.2",
     "axios": "^1.6.2",
     "canvas": "^2.11.2",
+    "cors": "^2.8.5",
     "discord.js": "^14.14.1",
     "dotenv": "^16.0.0",
     "express": "^5.1.0",
